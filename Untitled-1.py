@@ -4,15 +4,16 @@ import json
 import csv
 import re
 from pprint import pprint
-from collections import Iterable
+
 
 #二维数组降一维函数
-def flatten(items,ignore_types=(str,bytes)):
-    for x in items:
-        if isinstance(x,Iterable) and not isinstance(x,ignore_types):
-            yield from flatten(x)
+def flatten(a):
+    for each in a:
+        if not isinstance(each, list):
+            yield each
         else:
-            yield x
+            yield from flatten(each)
+
 
 # 把固定的参数定义成变量, 因为参数会根据接口的不同而变化，但这些固定参数不会
 u_key = '414a471ef24654e6b8413416a5048238'
@@ -80,46 +81,46 @@ def filter_html(content):
 issueStatus = get_qestion_status()
 status_key=[i['key'] for i in issueStatus]
 
-all_issues=flatten([get_qestion_list(s) for s in status_key])
+all_issues = []
+for s in status_key:
+    result = get_qestion_list(s)
+    if result is None:
+        continue
+    all_issues.append(result)
 
-# all_issues=all_issues1[1]
-print(all_issues)
+
+all_issues = list(flatten(all_issues))
+
+# pprint(all_issues)
 
 issueNo = [] #项目全部问题的issuekey
 
 # 现在开始遍历问题拿到备注
 for q in all_issues:
-    # 因为备注需要根据问题的issue_no获取，所以我们遍历可以拿到问题的issue_no再作为参数传给获取备注的函数，就能拿到每个问题的备注了
+    q.pop('projectModuleKey')
+    q.pop('assigneeAvator')
+    q.pop('projectTypeKey')
+    q.pop('userAvator')
+    q.pop('issueTypeBackground')
+    q.pop('issueStatus')
+    q.pop('issueKey')
     comments = get_issue_comment(q['issueNo'])
-    # 此时的comments变量应该是单个问题里的所有备注
-    # 在把单个问题的所有备注集合在一起，作为一个大的字符串
-    # 这里我做了判断，只有comments存在才走下面，这样会导致后面再导出的时候，有些有comment有些没有，造成报错
-    # 先定义一个空值，把位置占住，后面当有的时候再覆盖掉
+   
     q['issue_final_comment'] = ''
     if comments is None:
         continue
     issue_note_list = []
-    
     for comment in comments:
         if comment is None:
             continue
-        issue_note_list.append(comment['issueNote'])
-    
-    issue_all_comments = ' '.join(issue_note_list)
-    # 这样就拿到了一个问题里面所有的备注，可以打印出来看看
-    # 先要把HTML标签给去掉
-    # 然后把这个备注，插入到q里面，在把q写入到csv，就可以导出了
-    
-    # 这就是过滤后的字符串
-    final_comment = filter_html(issue_all_comments)
-    
-    # 然后我们把字符串写回到问题里面去
-    q['issue_final_comment'] = final_comment
-    
+        issue_note_list.append('[{}]{}'.format(comment['userName'],filter_html(comment['issueNote']))
+  
+    q['issue_final_comment'] = '\r\n'.join(issue_note_list)
+    pprint('正在载入%s'%(q['issueNo']))
     
 # 完成后把所有的问题打印出来看看
 # 用带格式的打印 pprint = pretty print 是一中带格式的打印，看起来更好看
-pprint(all_issues)
+# pprint(all_issues)
 
 tittle=sorted(all_issues[0].keys()) #获取所有列名
 
