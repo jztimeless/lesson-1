@@ -104,6 +104,7 @@ for q in all_issues:
     q.pop('issueTypeBackground')
     q.pop('issueStatus')
     q.pop('issueKey')
+    q.pop('hasFile')
     comments = get_issue_comment(q['issueNo'])
    
     q['issue_final_comment'] = ''
@@ -113,11 +114,11 @@ for q in all_issues:
     for comment in comments:
         if comment is None:
             continue
-        issue_note_list.append('[{}]{}'.format(comment['userName'],filter_html(comment['issueNote']))
+        issue_note_list.append('[{}]{}'.format(comment['userName'],filter_html(comment['issueNote'])))
   
     q['issue_final_comment'] = '\r\n'.join(issue_note_list)
     pprint('正在载入%s'%(q['issueNo']))
-    
+
 # 完成后把所有的问题打印出来看看
 # 用带格式的打印 pprint = pretty print 是一中带格式的打印，看起来更好看
 # pprint(all_issues)
@@ -130,13 +131,6 @@ with open('tracup.csv', 'w', newline='') as csvFile:
     writer.writeheader()       
     # 还可以写入多行
     writer.writerows(all_issues)
-
-
-
-
-
-
-
 
 
 
