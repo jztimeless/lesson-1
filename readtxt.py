@@ -14,4 +14,4 @@ with open('C:\Users\Joannd\Desktop\yisuoyuyan.txt','r') as f:
         if word in list1:      
             dict1[word] = list1.count(word)
     # print dict1
-    print sorted(dict1.items(), lambda x, y: cmp(x[1], y[1]), reverse = True)
+    print(sorted(dict1.items(), lambda x, y: cmp(x[1], y[1]), reverse = True))

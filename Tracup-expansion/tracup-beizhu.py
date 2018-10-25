@@ -182,6 +182,3 @@ with open('tracup.csv', 'w', newline='') as csvFile:
 #     writer.writeheader()       
 #     # 还可以写入多行
 #     writer.writerows(all_issues)
-
-
-

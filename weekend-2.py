@@ -10,12 +10,12 @@ def suijishengcheng(x,y):
     suijima = []
     while True:
         a=''.join(random.sample(L,x*4))
-        b='-'.join(([a[i:i+4] for i in xrange(0,x*4,4)]))
+        b='-'.join(([a[i:i+4] for i in range(0,x*4,4)]))
         if b in suijima:  
             continue
         suijima.append(b) 
         if len(suijima) > y:
             break
     return suijima
-print suijishengcheng(4,10)
+print(suijishengcheng(4,10))
 
